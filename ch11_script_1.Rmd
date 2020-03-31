@@ -39,20 +39,54 @@ county <- read_rds("county.rds")
 
 We are interested in understanding how poverty is correlated with (and influenced by?) education.
 
+```{r}
+
+summary(county)
+
+a <- county %>% 
+  mutate(combined = less_than_hs + hs)
+
+```
+
+
 
 # Scene 2
 
 **Prompt** Let’s start by exploring our numerical outcome variable `poverty` and our numerical explanatory variable `less_than_hs`. What is the average poverty rate in the US? How does this compare with that of your county (if you are not from US look up Middlesex County - the county that Cambridge, MA is in)? Furthermore, what is the average percentage of adults without a high school diploma? Which state's county has the highest percentage of adults without a high school diploma?
 
+```{r}
+stats <- county %>% 
+  summarize(mean_pov = mean(poverty),
+            mean_no_hs = mean(less_than_hs))
+
+stats
+
+county %>% 
+  arrange(desc(less_than_hs)) %>% 
+  select(state) %>% 
+  head(1)
+```
 
 # Scene 3
 
 **Prompt:** What is the correlation coefficient of `poverty` and `less_than_hs`? What does it mean? What does it suggest about the relation between the percent of the population in poverty in 2018 and the percent of the population with less than a high school degree in 2014? 
 
+```{r}
+county %>% 
+  summarize(pov_no_hs = cor(less_than_hs, poverty))
+
+```
+
 
 # Scene 4
 
 **Prompt:** Use a scatterplot to visualize this data, including a straight line of best fit. The dependent variable is `poverty`. The independent variable is `less_than_hs`.
+
+```{r}
+ggplot(a, aes(x = less_than_hs, y = poverty)) +
+  geom_point() +
+  geom_abline()
+```
 
 
 # Scene 5
@@ -60,6 +94,14 @@ We are interested in understanding how poverty is correlated with (and influence
 **Prompt** Create an animation of the scatterplot above with the percent of adults with less than a high school diploma on the x axis and the poverty rate in the y axis. This scatterplot should transition through the four US regions. Hint: Read the [Animation appendix](https://davidkane9.github.io/PPBDS/C-animation.html) of the *[Primer](https://davidkane9.github.io/PPBDS/)*. You need to do two things. First, make the points a different color for each region. Second, add one **gganimate** command to the basic static `ggplot()` call.
 
 Here is an example: https://rpubs.com/ruchajoshi/regional_poverty
+
+```{r}
+
+ggplot(a, aes(x = less_than_hs, y = poverty, color = region)) +
+  geom_point() +
+  gganimate()
+
+```
 
 
 # Scene 6
